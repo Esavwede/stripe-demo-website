@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stripe Checkout Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .main-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .main-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .store-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .store-header h2 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+      }
+
+      .store-header p {
+        opacity: 0.9;
+        font-size: 1rem;
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 30px;
+      }
+
+      .product-card {
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .product-card:hover {
+        border-color: #667eea;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+      }
+
+      .product-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.05) 0%,
+          rgba(118, 75, 162, 0.05) 100%
+        );
+      }
+
+      .product-card .checkmark {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 24px;
+        height: 24px;
+        background: #28a745;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+      }
+
+      .product-card.selected .checkmark {
+        display: flex;
+      }
+
+      .product-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+      }
+
+      .product-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .product-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        line-height: 1.4;
+      }
+
+      .product-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #667eea;
+      }
+
+      .cart-section {
+        padding: 30px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .cart-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .cart-items {
+        color: #666;
+        font-size: 1rem;
+      }
+
+      .cart-total {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .pay-button {
+        width: 100%;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 18px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .pay-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+      }
+
+      .pay-button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+
+      .pay-button.loading {
+        background: #6c757d;
+      }
+
+      .loading-text {
+        display: none;
+      }
+
+      .pay-button.loading .loading-text {
+        display: inline;
+      }
+
+      .pay-button.loading .default-text {
+        display: none;
+      }
+
+      .message {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 500;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .message.info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .message.show {
+        opacity: 1;
+      }
+
+      @media (max-width: 768px) {
+        .products-grid {
+          grid-template-columns: 1fr;
+          padding: 20px;
+        }
+
+        .cart-summary {
+          flex-direction: column;
+          gap: 10px;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-header">
+      <h1>Stripe Test Website</h1>
+    </div>
+
+    <div class="container">
+      <div class="store-header">
+        <h2>🛍️ Sample Store</h2>
+        <p>Select items and test the payment process</p>
+      </div>
+
+      <div class="products-grid">
+        <div
+          class="product-card"
+          data-id="1"
+          data-name="Premium Coffee"
+          data-price="12.99"
+        >
+          <div class="checkmark">✓</div>
+          <div class="product-icon">☕</div>
+          <div class="product-name">Premium Coffee</div>
+          <div class="product-description">
+            Artisan roasted coffee beans from Colombia
+          </div>
+          <div class="product-price">$12.99</div>
+        </div>
+
+        <div
+          class="product-card"
+          data-id="2"
+          data-name="Wireless Headphones"
+          data-price="89.99"
+        >
+          <div class="checkmark">✓</div>
+          <div class="product-icon">🎧</div>
+          <div class="product-name">Wireless Headphones</div>
+          <div class="product-description">
+            High-quality Bluetooth headphones with noise cancellation
+          </div>
+          <div class="product-price">$89.99</div>
+        </div>
+
+        <div
+          class="product-card"
+          data-id="3"
+          data-name="Organic T-Shirt"
+          data-price="24.99"
+        >
+          <div class="checkmark">✓</div>
+          <div class="product-icon">👕</div>
+          <div class="product-name">Organic T-Shirt</div>
+          <div class="product-description">
+            100% organic cotton t-shirt in various colors
+          </div>
+          <div class="product-price">$24.99</div>
+        </div>
+
+        <div
+          class="product-card"
+          data-id="4"
+          data-name="Smart Water Bottle"
+          data-price="34.99"
+        >
+          <div class="checkmark">✓</div>
+          <div class="product-icon">💧</div>
+          <div class="product-name">Smart Water Bottle</div>
+          <div class="product-description">
+            Temperature-controlled smart water bottle with app
+          </div>
+          <div class="product-price">$34.99</div>
+        </div>
+
+        <div
+          class="product-card"
+          data-id="5"
+          data-name="Desk Plant"
+          data-price="18.99"
+        >
+          <div class="checkmark">✓</div>
+          <div class="product-icon">🌱</div>
+          <div class="product-name">Desk Plant</div>
+          <div class="product-description">
+            Low-maintenance succulent perfect for your workspace
+          </div>
+          <div class="product-price">$18.99</div>
+        </div>
+
+        <div
+          class="product-card"
+          data-id="6"
+          data-name="Notebook Set"
+          data-price="16.99"
+        >
+          <div class="checkmark">✓</div>
+          <div class="product-icon">📝</div>
+          <div class="product-name">Notebook Set</div>
+          <div class="product-description">
+            Set of 3 premium lined notebooks for journaling
+          </div>
+          <div class="product-price">$16.99</div>
+        </div>
+      </div>
+
+      <div class="cart-section">
+        <div class="cart-summary">
+          <div class="cart-items" id="cartItems">No items selected</div>
+          <div class="cart-total" id="cartTotal">$0.00</div>
+        </div>
+
+        <button class="pay-button" id="payButton" disabled>
+          <span class="default-text">Select items to pay</span>
+          <span class="loading-text"
+            >Sending request to backend to create payment intent...</span
+          >
+        </button>
+
+        <div id="message" class="message"></div>
+      </div>
+    </div>
+
+    <script>
+      let selectedItems = [];
+
+      // Add click listeners to product cards
+      document.querySelectorAll(".product-card").forEach((card) => {
+        card.addEventListener("click", function () {
+          const id = this.dataset.id;
+          const name = this.dataset.name;
+          const price = parseFloat(this.dataset.price);
+
+          if (this.classList.contains("selected")) {
+            // Remove item
+            this.classList.remove("selected");
+            selectedItems = selectedItems.filter((item) => item.id !== id);
+          } else {
+            // Add item
+            this.classList.add("selected");
+            selectedItems.push({ id, name, price });
+          }
+
+          updateCartDisplay();
+        });
+      });
+
+      function updateCartDisplay() {
+        const cartItemsElement = document.getElementById("cartItems");
+        const cartTotalElement = document.getElementById("cartTotal");
+        const payButton = document.getElementById("payButton");
+
+        if (selectedItems.length === 0) {
+          cartItemsElement.textContent = "No items selected";
+          cartTotalElement.textContent = "$0.00";
+          payButton.disabled = true;
+          payButton.querySelector(".default-text").textContent =
+            "Select items to pay";
+        } else {
+          const itemCount = selectedItems.length;
+          const total = selectedItems.reduce(
+            (sum, item) => sum + item.price,
+            0
+          );
+
+          cartItemsElement.textContent = `${itemCount} item${
+            itemCount > 1 ? "s" : ""
+          } selected`;
+          cartTotalElement.textContent = `$${total.toFixed(2)}`;
+          payButton.disabled = false;
+          payButton.querySelector(
+            ".default-text"
+          ).textContent = `Pay $${total.toFixed(2)}`;
+        }
+      }
+
+      // Handle pay button click
+      document
+        .getElementById("payButton")
+        .addEventListener("click", function () {
+          if (selectedItems.length === 0) return;
+
+          const message = document.getElementById("message");
+
+          // Show only the confirmation message
+          message.textContent =
+            "Sending request to backend to create payment intent";
+          message.className = "message info show";
+        });
+    </script>
+  </body>
+</html>
