@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Card Information</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .main-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .card-header h2 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+      }
+
+      .card-header p {
+        opacity: 0.9;
+        font-size: 1rem;
+      }
+
+      .demo-card {
+        padding: 40px;
+        text-align: center;
+      }
+
+      .card-visual {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        border-radius: 15px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card-visual::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .card-number {
+        font-family: "Courier New", monospace;
+        font-size: 1.6rem;
+        letter-spacing: 4px;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .card-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .card-detail {
+        text-align: left;
+      }
+
+      .card-detail-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .card-detail-value {
+        font-family: "Courier New", monospace;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .info-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .info-section h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+      }
+
+      .info-list {
+        list-style: none;
+        color: #666;
+      }
+
+      .info-list li {
+        margin-bottom: 8px;
+        padding-left: 20px;
+        position: relative;
+      }
+
+      .info-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .copy-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 5px;
+        transition: all 0.3s ease;
+      }
+
+      .copy-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .copy-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .copy-message {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .copy-message.show {
+        opacity: 1;
+      }
+
+      @media (max-width: 768px) {
+        .card-number {
+          font-size: 1.3rem;
+          letter-spacing: 2px;
+        }
+
+        .card-details {
+          flex-direction: column;
+          gap: 15px;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-header">
+      <h1>Stripe Test Website</h1>
+    </div>
+
+    <div class="container">
+      <div class="card-header">
+        <h2>🧪 Demo Card Details</h2>
+        <p>Test card information for Stripe integration</p>
+      </div>
+
+      <div class="demo-card">
+        <div class="card-visual">
+          <div class="card-number">4000 0027 6000 3184</div>
+          <div class="card-details">
+            <div class="card-detail">
+              <div class="card-detail-label">Expiry Date</div>
+              <div class="card-detail-value">02/29</div>
+            </div>
+            <div class="card-detail">
+              <div class="card-detail-label">CVC</div>
+              <div class="card-detail-value">957</div>
+            </div>
+            <div class="card-detail">
+              <div class="card-detail-label">ZIP</div>
+              <div class="card-detail-value">29177</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3>Test Card Information</h3>
+          <ul class="info-list">
+            <li>This is a Stripe test card for development purposes</li>
+            <li>Will simulate successful payments in test mode</li>
+            <li>No real charges will be made</li>
+            <li>Use with your test publishable key</li>
+          </ul>
+        </div>
+
+        <div class="copy-buttons">
+          <button
+            class="copy-button"
+            onclick="copyToClipboard('4000002760003184', 'Card number')"
+          >
+            Copy Card Number
+          </button>
+          <button class="copy-button" onclick="copyToClipboard('957', 'CVC')">
+            Copy CVC
+          </button>
+          <button
+            class="copy-button"
+            onclick="copyToClipboard('02/29', 'Expiry')"
+          >
+            Copy Expiry
+          </button>
+          <button class="copy-button" onclick="copyToClipboard('29177', 'ZIP')">
+            Copy ZIP
+          </button>
+        </div>
+
+        <div id="copyMessage" class="copy-message"></div>
+      </div>
+    </div>
+
+    <script>
+      function copyToClipboard(text, label) {
+        navigator.clipboard
+          .writeText(text)
+          .then(function () {
+            showCopyMessage(`${label} copied to clipboard!`);
+          })
+          .catch(function () {
+            // Fallback for older browsers
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            showCopyMessage(`${label} copied to clipboard!`);
+          });
+      }
+
+      function showCopyMessage(message) {
+        const messageDiv = document.getElementById("copyMessage");
+        messageDiv.textContent = message;
+        messageDiv.classList.add("show");
+
+        setTimeout(() => {
+          messageDiv.classList.remove("show");
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
