@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Publishable Key Storage</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .main-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .main-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .title {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+
+      .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 1rem;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .message {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .message.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .message.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .message.show {
+        opacity: 1;
+      }
+
+      .stored-value {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+      }
+
+      .stored-value h3 {
+        margin: 0 0 10px 0;
+        color: #333;
+      }
+
+      .stored-value p {
+        margin: 0;
+        font-family: monospace;
+        background: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        word-break: break-all;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-header">
+      <h1>Stripe Test Website</h1>
+    </div>
+
+    <div class="container">
+      <h1 class="title">🔐 Key Storage</h1>
+      <p class="subtitle">
+        Store your publishable key securely in browser storage
+      </p>
+
+      <form id="keyForm">
+        <div class="form-group">
+          <label for="publishableKey">Publishable Key:</label>
+          <input
+            type="text"
+            id="publishableKey"
+            name="publishableKey"
+            placeholder="Enter your publishable key..."
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn">Store Key</button>
+      </form>
+
+      <div id="message" class="message"></div>
+
+      <div id="storedValue" class="stored-value" style="display: none">
+        <h3>Currently Stored Key:</h3>
+        <p id="currentKey"></p>
+      </div>
+    </div>
+
+    <script>
+      // Check for existing key on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        displayStoredKey();
+      });
+
+      // Handle form submission
+      document
+        .getElementById("keyForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const publishableKey = document
+            .getElementById("publishableKey")
+            .value.trim();
+
+          if (!publishableKey) {
+            showMessage("Please enter a valid publishable key.", "error");
+            return;
+          }
+
+          try {
+            // Store in localStorage (accessible by other webpages on same domain)
+            localStorage.setItem("publishableKey", publishableKey);
+
+            showMessage("Publishable key stored successfully!", "success");
+
+            // Clear the input
+            document.getElementById("publishableKey").value = "";
+
+            // Display the stored key
+            displayStoredKey();
+          } catch (error) {
+            showMessage("Error storing key: " + error.message, "error");
+          }
+        });
+
+      function showMessage(text, type) {
+        const messageDiv = document.getElementById("message");
+        messageDiv.textContent = text;
+        messageDiv.className = `message ${type} show`;
+
+        // Hide message after 3 seconds
+        setTimeout(() => {
+          messageDiv.classList.remove("show");
+        }, 3000);
+      }
+
+      function displayStoredKey() {
+        const storedKey = localStorage.getItem("publishableKey");
+        const storedValueDiv = document.getElementById("storedValue");
+        const currentKeyP = document.getElementById("currentKey");
+
+        if (storedKey) {
+          currentKeyP.textContent = storedKey;
+          storedValueDiv.style.display = "block";
+        } else {
+          storedValueDiv.style.display = "none";
+        }
+      }
+
+      // Optional: Function to retrieve the key (can be called from other pages)
+      function getPublishableKey() {
+        return localStorage.getItem("publishableKey");
+      }
+
+      // Optional: Function to remove the key
+      function removePublishableKey() {
+        localStorage.removeItem("publishableKey");
+        displayStoredKey();
+        showMessage("Publishable key removed.", "success");
+      }
+
+      // Make functions available globally for other scripts
+      window.getPublishableKey = getPublishableKey;
+      window.removePublishableKey = removePublishableKey;
+    </script>
+  </body>
+</html>
