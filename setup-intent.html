@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stripe Setup Intent Demo</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f8f9fa;
+      }
+
+      .container {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #32325d;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #525f7f;
+        font-weight: 500;
+      }
+
+      #card-element {
+        padding: 15px;
+        border: 1px solid #e6ebf1;
+        border-radius: 8px;
+        background: white;
+        transition: border-color 0.15s ease;
+      }
+
+      #card-element:focus-within {
+        border-color: #6772e5;
+        box-shadow: 0 0 0 3px rgba(103, 114, 229, 0.1);
+      }
+
+      #submit-button {
+        width: 100%;
+        padding: 15px;
+        background: #6772e5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      #submit-button:hover {
+        background: #5469d4;
+      }
+
+      #submit-button:disabled {
+        background: #cbd5e0;
+        cursor: not-allowed;
+      }
+
+      .error {
+        color: #e74c3c;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #c3e6cb;
+        text-align: center;
+      }
+
+      .payment-method-id {
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        margin: 15px 0;
+        word-break: break-all;
+        font-size: 14px;
+      }
+
+      .copy-instruction {
+        font-size: 14px;
+        color: #6c757d;
+        margin-top: 10px;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        color: #6c757d;
+        margin: 20px 0;
+      }
+
+      /* Modal styles */
+      .modal {
+        display: flex;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .modal h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #32325d;
+        text-align: center;
+      }
+
+      .modal input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e6ebf1;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        box-sizing: border-box;
+      }
+
+      .modal input:focus {
+        outline: none;
+        border-color: #6772e5;
+        box-shadow: 0 0 0 3px rgba(103, 114, 229, 0.1);
+      }
+
+      .modal-buttons {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .modal-button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .modal-button.primary {
+        background: #6772e5;
+        color: white;
+      }
+
+      .modal-button.primary:hover {
+        background: #5469d4;
+      }
+
+      .modal-button.secondary {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+      }
+
+      .modal-button.secondary:hover {
+        background: #e9ecef;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Client Secret Modal -->
+    <div id="client-secret-modal" class="modal">
+      <div class="modal-content">
+        <h2>Enter Client Secret</h2>
+        <p style="margin-bottom: 15px; color: #6c757d; font-size: 14px">
+          Please enter your Setup Intent client secret to continue:
+        </p>
+        <input
+          type="text"
+          id="client-secret-input"
+          placeholder="seti_..."
+          autocomplete="off"
+        />
+        <div class="modal-buttons">
+          <button class="modal-button secondary" id="modal-cancel">
+            Cancel
+          </button>
+          <button class="modal-button primary" id="modal-confirm">
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1>Stripe Setup Intent Demo</h1>
+
+      <!-- Card Form -->
+      <div id="card-form">
+        <div class="form-group">
+          <label for="card-element">Card Details</label>
+          <div id="card-element"></div>
+          <div id="card-errors" class="error"></div>
+        </div>
+
+        <button id="submit-button">Confirm Setup Intent</button>
+
+        <div class="loading" id="loading">Processing...</div>
+      </div>
+
+      <!-- Success Result -->
+      <div id="success-result" class="success" style="display: none">
+        <h2>Setup Intent Confirmed Successfully!</h2>
+        <div class="payment-method-id" id="payment-method-display"></div>
+        <div class="copy-instruction">
+          Please copy the Payment Method ID above for your records.
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Get publishable key from localStorage (simulated with variable for Claude.ai)
+      // In your environment, this will work: const publishableKey = localStorage.getItem('publishableKey');
+      const publishableKey = localStorage.getItem("publishableKey"); // This simulates localStorage.getItem('publishableKey')
+
+      let stripe, elements, cardElement, clientSecret;
+
+      // Initialize the page
+      async function initializePage() {
+        try {
+          // Check if publishable key exists
+          if (!publishableKey) {
+            alert(
+              'Stripe publishable key not found in localStorage. Please set "publishableKey" first.'
+            );
+            return;
+          }
+
+          // Show modal to get client secret
+          showClientSecretModal();
+        } catch (error) {
+          console.error("Initialization error:", error);
+          alert("Error initializing: " + error.message);
+        }
+      }
+
+      function showClientSecretModal() {
+        const modal = document.getElementById("client-secret-modal");
+        const input = document.getElementById("client-secret-input");
+        const confirmButton = document.getElementById("modal-confirm");
+        const cancelButton = document.getElementById("modal-cancel");
+
+        modal.style.display = "flex";
+        input.focus();
+
+        // Handle confirm button
+        confirmButton.onclick = () => {
+          const inputValue = input.value.trim();
+          if (!inputValue) {
+            alert("Please enter a client secret");
+            return;
+          }
+
+          clientSecret = inputValue;
+          modal.style.display = "none";
+          initializeStripe();
+        };
+
+        // Handle cancel button
+        cancelButton.onclick = () => {
+          modal.style.display = "none";
+        };
+
+        // Handle Enter key in input
+        input.onkeypress = (e) => {
+          if (e.key === "Enter") {
+            confirmButton.click();
+          }
+        };
+      }
+
+      function initializeStripe() {
+        try {
+          // Initialize Stripe
+          stripe = Stripe(publishableKey);
+          elements = stripe.elements();
+
+          // Create card element
+          cardElement = elements.create("card", {
+            style: {
+              base: {
+                fontSize: "16px",
+                color: "#424770",
+                "::placeholder": {
+                  color: "#aab7c4",
+                },
+              },
+              invalid: {
+                color: "#9e2146",
+              },
+            },
+          });
+
+          cardElement.mount("#card-element");
+
+          // Handle card validation errors
+          cardElement.on("change", ({ error }) => {
+            const displayError = document.getElementById("card-errors");
+            if (error) {
+              displayError.textContent = error.message;
+            } else {
+              displayError.textContent = "";
+            }
+          });
+
+          // Handle form submission
+          document
+            .getElementById("submit-button")
+            .addEventListener("click", handleSubmit);
+        } catch (error) {
+          console.error("Stripe initialization error:", error);
+          alert("Error initializing Stripe: " + error.message);
+        }
+      }
+
+      async function handleSubmit(event) {
+        event.preventDefault();
+
+        const submitButton = document.getElementById("submit-button");
+        const loading = document.getElementById("loading");
+        const cardErrors = document.getElementById("card-errors");
+
+        // Clear previous errors
+        cardErrors.textContent = "";
+
+        // Disable submit button and show loading
+        submitButton.disabled = true;
+        loading.style.display = "block";
+        submitButton.textContent = "Processing...";
+
+        try {
+          // Confirm the setup intent
+          const { error, setupIntent } = await stripe.confirmCardSetup(
+            clientSecret,
+            {
+              payment_method: {
+                card: cardElement,
+              },
+            }
+          );
+
+          if (error) {
+            // Show error to customer
+            cardErrors.textContent = error.message;
+            console.error("Setup intent confirmation error:", error);
+          } else {
+            // Success! Show the payment method ID
+            showSuccess(setupIntent.payment_method);
+          }
+        } catch (error) {
+          console.error("Unexpected error:", error);
+          cardErrors.textContent =
+            "An unexpected error occurred. Please try again.";
+        } finally {
+          // Re-enable submit button and hide loading
+          submitButton.disabled = false;
+          loading.style.display = "none";
+          submitButton.textContent = "Confirm Setup Intent";
+        }
+      }
+
+      function showSuccess(paymentMethodId) {
+        // Hide the form
+        document.getElementById("card-form").style.display = "none";
+
+        // Show success message with payment method ID
+        document.getElementById("payment-method-display").textContent =
+          paymentMethodId;
+        document.getElementById("success-result").style.display = "block";
+      }
+
+      // Initialize when page loads
+      window.addEventListener("load", initializePage);
+    </script>
+  </body>
+</html>
