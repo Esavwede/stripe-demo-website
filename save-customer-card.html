@@ -66,16 +66,6 @@
         padding: 40px;
       }
 
-      .status-info {
-        background: #e7f3ff;
-        border: 1px solid #b6e7ff;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        color: #0066cc;
-      }
-
       .form-group {
         margin-bottom: 25px;
       }
@@ -125,6 +115,35 @@
         min-height: 20px;
       }
 
+      .create-button {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 18px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .create-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .create-button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .create-button.processing {
+        background: #6c757d;
+      }
+
       .security-info {
         display: flex;
         align-items: center;
@@ -139,102 +158,93 @@
         margin-right: 8px;
       }
 
-      .create-button {
-        width: 100%;
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        padding: 18px;
-        border: none;
-        border-radius: 12px;
-        font-size: 1.2rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
+      .error-message,
+      .success-message {
         margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-align: center;
       }
 
-      .create-button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+      .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
       }
 
-      .create-button:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-        transform: none;
+      .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
       }
 
-      .create-button.processing {
-        background: #6c757d;
+      .status-info {
+        background: #e7f3ff;
+        border: 1px solid #b6e7ff;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #0066cc;
       }
 
-      .result-container {
+      .payment-method-result {
+        display: none;
         text-align: center;
         padding: 40px;
-        display: none;
+      }
+
+      .payment-method-result.show {
+        display: block;
       }
 
       .payment-method-id {
         background: #f8f9fa;
-        border: 2px solid #667eea;
-        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
         padding: 20px;
-        font-family: "Courier New", monospace;
-        font-size: 1.1rem;
-        word-break: break-all;
         margin: 20px 0;
+        font-family: "Courier New", monospace;
+        font-size: 16px;
         color: #333;
-      }
-
-      .copy-instruction {
-        font-size: 1.2rem;
-        color: #667eea;
-        font-weight: 600;
-        margin-bottom: 20px;
+        word-break: break-all;
+        position: relative;
       }
 
       .copy-button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         color: white;
         border: none;
-        padding: 15px 30px;
+        padding: 12px 24px;
         border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: 16px;
+        font-weight: 500;
         cursor: pointer;
         transition: all 0.3s ease;
         margin-top: 15px;
       }
 
       .copy-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
       }
 
-      .error-message {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 8px;
-        font-weight: 500;
-        text-align: center;
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
+      .copy-button.copied {
+        background: #6c757d;
       }
 
-      .copy-message {
-        margin-top: 15px;
-        padding: 10px;
-        border-radius: 5px;
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-        opacity: 0;
-        transition: opacity 0.3s ease;
+      .instruction-text {
+        color: #666;
+        font-size: 16px;
+        margin-bottom: 20px;
+        line-height: 1.6;
       }
 
-      .copy-message.show {
-        opacity: 1;
+      .result-header {
+        font-size: 2rem;
+        color: #28a745;
+        margin-bottom: 20px;
       }
 
       @media (max-width: 768px) {
@@ -246,19 +256,19 @@
   </head>
   <body>
     <div class="main-header">
-      <h1>Stripe Test Website</h1>
+      <h1>Payment Method Creator</h1>
     </div>
 
     <div class="container">
       <div class="payment-header">
-        <h2>🔧 Create Payment Method</h2>
-        <p>Generate a payment method ID using Stripe</p>
+        <h2>💳 Create Payment Method</h2>
+        <p>Enter your card details to create a payment method</p>
       </div>
 
       <div class="form-container" id="formContainer">
         <div class="status-info" id="statusInfo">Initializing Stripe...</div>
 
-        <form id="payment-form">
+        <form id="payment-method-form">
           <div class="form-group">
             <label for="email">Email Address</label>
             <input
@@ -300,141 +310,140 @@
             Your payment information is secure and encrypted
           </div>
 
-          <div id="payment-result"></div>
+          <div id="creation-result"></div>
         </form>
       </div>
 
-      <div class="result-container" id="resultContainer">
-        <div class="copy-instruction">Please copy payment ID:</div>
-        <div class="payment-method-id" id="paymentMethodId"></div>
-        <button class="copy-button" onclick="copyPaymentMethodId()">
-          Copy Payment Method ID
+      <div class="payment-method-result" id="paymentMethodResult">
+        <div class="result-header">✅ Success!</div>
+        <p class="instruction-text">
+          Your payment method has been created successfully. Copy the payment
+          method ID below:
+        </p>
+        <div class="payment-method-id" id="paymentMethodId">
+          <!-- Payment method ID will be inserted here -->
+        </div>
+        <button class="copy-button" id="copyButton" onclick="copyToClipboard()">
+          📋 Copy Payment Method ID
         </button>
-        <div id="copyMessage" class="copy-message"></div>
+        <p class="instruction-text" style="margin-top: 20px; font-size: 14px">
+          You can now use this payment method ID with your Stripe integration.
+        </p>
       </div>
     </div>
 
     <script>
       let stripe;
+      let elements;
       let publishableKey;
-      let paymentMethodIdValue = "";
 
-      // Initialize Stripe
+      // Function to initialize Stripe
       function initializeStripe() {
         const statusInfo = document.getElementById("statusInfo");
 
-        publishableKey = localStorage.getItem("publishableKey");
+        // Check if running in browser storage environment
+        if (typeof Storage !== "undefined") {
+          // Get publishable key from localStorage
+          publishableKey = localStorage.getItem("publishableKey");
+        } else {
+          // Fallback: prompt for publishable key
+          publishableKey = prompt(
+            "Please enter your Stripe publishable key (pk_test_...):"
+          );
+        }
 
         if (!publishableKey) {
           statusInfo.innerHTML =
-            "❌ Error: No publishable key found. Please go to the key storage page first.";
+            "❌ Error: No publishable key found. Please provide your Stripe publishable key.";
           statusInfo.style.background = "#f8d7da";
           statusInfo.style.color = "#721c24";
           statusInfo.style.borderColor = "#f5c6cb";
           return;
         }
 
-        stripe = Stripe(publishableKey);
+        try {
+          // Initialize Stripe
+          stripe = Stripe(publishableKey);
+          elements = stripe.elements();
 
-        // Create card element with fixed test card values
-        const elements = stripe.elements();
-        const cardElement = elements.create("card", {
-          style: {
-            base: {
-              fontSize: "16px",
-              color: "#333",
-              fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
-              "::placeholder": {
-                color: "#aab7c4",
-              },
-            },
-          },
-          value: {
-            number: "4242424242424242",
-            exp_month: 2,
-            exp_year: 29,
-            cvc: "957",
-          },
-        });
-
-        cardElement.mount("#card-element");
-
-        // Handle real-time validation errors from the card Element
-        cardElement.on("change", ({ error }) => {
-          const displayError = document.getElementById("card-errors");
-          if (error) {
-            displayError.textContent = error.message;
-          } else {
-            displayError.textContent = "";
-          }
-        });
-
-        // Store card element for form submission
-        window.cardElement = cardElement;
-
-        document.getElementById("submit-button").disabled = false;
-        statusInfo.innerHTML =
-          "✅ Stripe initialized successfully. Ready to create payment methods.";
-        statusInfo.style.background = "#d4edda";
-        statusInfo.style.color = "#155724";
-        statusInfo.style.borderColor = "#c3e6cb";
-      }
-
-      // Form submission
-      document
-        .getElementById("payment-form")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-
-          if (!stripe || !window.cardElement) {
-            showError("Stripe is not properly initialized.");
-            return;
-          }
-
-          setLoading(true);
-
-          // Create payment method using the card element (but override with fixed test card)
-          try {
-            const { paymentMethod, error } = await stripe.createPaymentMethod({
-              type: "card",
-              card: {
-                number: "4242424242424242",
-                exp_month: 2,
-                exp_year: 29,
-                cvc: "957",
-              },
-              billing_details: {
-                name: document.getElementById("cardholder-name").value,
-                email: document.getElementById("email").value,
-                address: {
-                  postal_code: "29177",
+          // Create card element
+          const cardElement = elements.create("card", {
+            style: {
+              base: {
+                fontSize: "16px",
+                color: "#333",
+                fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+                "::placeholder": {
+                  color: "#aab7c4",
                 },
               },
-            });
+            },
+          });
 
+          cardElement.mount("#card-element");
+
+          // Handle real-time validation errors from the card Element
+          cardElement.on("change", ({ error }) => {
+            const displayError = document.getElementById("card-errors");
             if (error) {
-              showError(error.message);
+              displayError.textContent = error.message;
             } else {
-              showPaymentMethodId(paymentMethod.id);
+              displayError.textContent = "";
             }
-          } catch (err) {
-            showError("An error occurred: " + err.message);
-          }
+          });
 
-          setLoading(false);
-        });
-
-      function showError(message) {
-        const resultDiv = document.getElementById("payment-result");
-        resultDiv.innerHTML = `<div class="error-message">${message}</div>`;
+          // Enable the submit button
+          document.getElementById("submit-button").disabled = false;
+          statusInfo.innerHTML =
+            "✅ Stripe initialized successfully. Ready to create payment methods.";
+          statusInfo.style.background = "#d4edda";
+          statusInfo.style.color = "#155724";
+          statusInfo.style.borderColor = "#c3e6cb";
+        } catch (error) {
+          statusInfo.innerHTML =
+            "❌ Error: Invalid publishable key. Please check your key and try again.";
+          statusInfo.style.background = "#f8d7da";
+          statusInfo.style.color = "#721c24";
+          statusInfo.style.borderColor = "#f5c6cb";
+        }
       }
 
-      function showPaymentMethodId(paymentMethodId) {
-        paymentMethodIdValue = paymentMethodId;
-        document.getElementById("paymentMethodId").textContent =
-          paymentMethodId;
-        document.getElementById("formContainer").style.display = "none";
-        document.getElementById("resultContainer").style.display = "block";
+      // Handle form submission
+      const form = document.getElementById("payment-method-form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!stripe || !elements) {
+          showError("Stripe is not properly initialized.");
+          return;
+        }
+
+        setLoading(true);
+
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+          type: "card",
+          card: elements.getElement("card"),
+          billing_details: {
+            name: document.getElementById("cardholder-name").value,
+            email: document.getElementById("email").value,
+          },
+        });
+
+        if (error) {
+          showError(error.message);
+          setLoading(false);
+        } else {
+          // Hide the form and show the result
+          document.getElementById("formContainer").style.display = "none";
+          document.getElementById("paymentMethodResult").classList.add("show");
+          document.getElementById("paymentMethodId").textContent =
+            paymentMethod.id;
+        }
+      });
+
+      function showError(message) {
+        const resultDiv = document.getElementById("creation-result");
+        resultDiv.innerHTML = `<div class="error-message">${message}</div>`;
       }
 
       function setLoading(isLoading) {
@@ -444,7 +453,7 @@
         if (isLoading) {
           submitButton.disabled = true;
           submitButton.classList.add("processing");
-          buttonText.textContent = "Creating Payment Method...";
+          buttonText.textContent = "Creating...";
         } else {
           submitButton.disabled = false;
           submitButton.classList.remove("processing");
@@ -452,31 +461,57 @@
         }
       }
 
-      function copyPaymentMethodId() {
-        navigator.clipboard
-          .writeText(paymentMethodIdValue)
-          .then(function () {
-            showCopyMessage("Payment Method ID copied to clipboard!");
-          })
-          .catch(function () {
-            const textArea = document.createElement("textarea");
-            textArea.value = paymentMethodIdValue;
-            document.body.appendChild(textArea);
-            textArea.select();
+      function copyToClipboard() {
+        const paymentMethodId =
+          document.getElementById("paymentMethodId").textContent;
+        const copyButton = document.getElementById("copyButton");
+
+        // Try to use the modern clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard
+            .writeText(paymentMethodId)
+            .then(() => {
+              copyButton.textContent = "✅ Copied!";
+              copyButton.classList.add("copied");
+              setTimeout(() => {
+                copyButton.textContent = "📋 Copy Payment Method ID";
+                copyButton.classList.remove("copied");
+              }, 2000);
+            })
+            .catch(() => {
+              fallbackCopy();
+            });
+        } else {
+          fallbackCopy();
+        }
+
+        function fallbackCopy() {
+          // Fallback for older browsers
+          const textArea = document.createElement("textarea");
+          textArea.value = paymentMethodId;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+
+          try {
             document.execCommand("copy");
-            document.body.removeChild(textArea);
-            showCopyMessage("Payment Method ID copied to clipboard!");
-          });
-      }
+            copyButton.textContent = "✅ Copied!";
+            copyButton.classList.add("copied");
+            setTimeout(() => {
+              copyButton.textContent = "📋 Copy Payment Method ID";
+              copyButton.classList.remove("copied");
+            }, 2000);
+          } catch (err) {
+            alert(
+              "Copy failed. Please manually select and copy the payment method ID."
+            );
+          }
 
-      function showCopyMessage(message) {
-        const messageDiv = document.getElementById("copyMessage");
-        messageDiv.textContent = message;
-        messageDiv.classList.add("show");
-
-        setTimeout(() => {
-          messageDiv.classList.remove("show");
-        }, 2000);
+          textArea.remove();
+        }
       }
 
       // Initialize when page loads
